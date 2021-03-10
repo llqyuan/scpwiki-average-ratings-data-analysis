@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 
-class GeneralData(object):
+class GeneralData:
     def __init__(self, filename):
         '''
         filename: Name of file to save data to
@@ -25,7 +25,7 @@ class GeneralData(object):
         idx: scp number
         writefile: file to write to
         '''
-        if (idx % 10 == 0):
+        if (idx % 20 == 0):
             print("Passed SCP-{0:03}".format(idx))
         
         try:
@@ -62,4 +62,4 @@ class GeneralData(object):
                 this._get_for_page(idx, writefile, retry_count + 1)
 
 if __name__=="__main__":
-    GeneralData("rdata/data.txt").run()
+    GeneralData("data.txt").run()
