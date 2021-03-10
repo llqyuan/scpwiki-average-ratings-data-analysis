@@ -18,34 +18,49 @@ class GeneralData(object):
             f.write("scp_number rating comments\n")
 
             for idx in range(1, 6000):
-                if (idx % 10 == 0):
-                    print("Passed SCP-{0:03}".format(idx))
-                
-                page = requests.get(self.base_url + "scp-{0:03}".format(idx))
-                root_page = BeautifulSoup(page.content, "html.parser")
-                rating = root_page.find(id="pagerate-button")
-                comments = root_page.find(id="discuss-button")
+                self._get_for_page(idx, f)
 
-                if (rating is None or comments is None):
-                    continue
+    def _get_for_page(self, idx, writefile, retry_count=0):
+        '''
+        idx: scp number
+        writefile: file to write to
+        '''
+        if (idx % 10 == 0):
+            print("Passed SCP-{0:03}".format(idx))
+        
+        try:
+            page = requests.get(self.base_url + "scp-{0:03}".format(idx))
+            root_page = BeautifulSoup(page.content, "html.parser")
+            rating = root_page.find(id="pagerate-button")
+            comments = root_page.find(id="discuss-button")
 
-                rating_str = rating.text
-                comments_str = comments.text
-                
-                # Format of rating_str is "Rate (+495)"
-                rate_num_temp = rating_str.split("(")[1].split(")")[0]
-                if rate_num_temp.startswith("+") or rate_num_temp.startswith("-"):
-                    rate_num_temp = rate_num_temp[1:]
-                if (rate_num_temp == ""):
-                    # skip SCPs that are behind some sort of content wall
-                    f.write("{0}\n".format(idx))
-                    continue
+            if (rating is None or comments is None):
+                return
 
-                rate_num = int(rate_num_temp)
-                # Format of comments_str is "Discuss (54)"
-                comments_num = int(comments_str.split("(")[1].split(")")[0])
+            rating_str = rating.text
+            comments_str = comments.text
+            
+            # Format of rating_str is "Rate (+495)"
+            rate_num_temp = rating_str.split("(")[1].split(")")[0]
+            if rate_num_temp.startswith("+") or rate_num_temp.startswith("-"):
+                rate_num_temp = rate_num_temp[1:]
+            if (rate_num_temp == ""):
+                # skip SCPs that are behind some sort of content wall
+                writefile.write("{0}\n".format(idx))
+                return
 
-                f.write("{0} {1} {2}\n".format(idx, rate_num, comments_num))
+            rate_num = int(rate_num_temp)
+            # Format of comments_str is "Discuss (54)"
+            comments_num = int(comments_str.split("(")[1].split(")")[0])
+
+            writefile.write("{0} {1} {2}\n".format(idx, rate_num, comments_num))
+
+        except ConnectionResetError as e:
+            if retry_count > 5:
+                raise e
+            else:
+                print("Connection reset, retry attempt {0}".format(retry_count + 1))
+                this._get_for_page(idx, writefile, retry_count + 1)
 
 if __name__=="__main__":
-    GeneralData("data.txt").run()
+    GeneralData("rdata/data.txt").run()
