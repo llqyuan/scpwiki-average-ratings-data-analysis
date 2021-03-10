@@ -46,7 +46,6 @@ class GeneralData(object):
                 rate_num_temp = rate_num_temp[1:]
             if (rate_num_temp == ""):
                 # skip SCPs that are behind some sort of content wall
-                writefile.write("{0}\n".format(idx))
                 return
 
             rate_num = int(rate_num_temp)
