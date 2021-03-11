@@ -187,7 +187,8 @@ The model will be the same one as before, aside from a difference in interpretat
 
 ```{r}
 model <- lm(ratio~group, all.data)
-sigmahat <- summary(model)$sigma # Residual standard error
+sigmahat <- summary(model)$sigma
+sigmahat # Residual standard error
 plot(fitted(model), rstudent(model))
 qqnorm(resid(model))
 qqline(resid(model))
