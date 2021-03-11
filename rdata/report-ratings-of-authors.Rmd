@@ -157,7 +157,7 @@ $$
 \end{aligned}
 $$
 
-where $n=5697$ is the number of observations; there are 3 non-$\sigma$ parameters and 1 constraint. The pivotal quantity is $$D = \frac{\tilde{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \tilde{\sigma}^2} \sim t_{5695}$$ The discrepancy statistic is $$d = \frac{\hat{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \hat{\sigma}^2}$$
+where $n=5697$ is the number of observations; there are 3 non-$\sigma$ parameters and 1 constraint. The pivotal quantity is $$D = \frac{\tilde{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \tilde{\sigma}^2} \sim t_{5695}$$ The discrepancy statistic is $$d = \frac{\hat{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \hat{\sigma}^2}$$ The p-value would be $p = Pr(D > d)$.
 
 
 ```{r}
