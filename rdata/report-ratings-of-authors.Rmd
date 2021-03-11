@@ -181,7 +181,7 @@ The average rating-comment ratio of author A is greater than the average rating-
 
 ### Model
 
-The model will be the same one as before.
+The model will be the same one as before, aside from a difference in interpretation of the attribute $\mu$: it is now the mean rating-comment ratio.
 
 ### Assessing appropriateness of model
 
