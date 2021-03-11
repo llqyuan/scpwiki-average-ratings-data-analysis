@@ -1,10 +1,13 @@
 ---
 title: "Data analysis: Average ratings of authors"
-output: pdf_document
+output: 
+  pdf_document:
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(contrasts = c("contr.sum", "contr.poly"))
 ```
 
 ```{r read}
@@ -54,7 +57,8 @@ all.data <- data.frame(
   scp=scp1, 
   rating=rating1, 
   comments=comments1, 
-  group=as.factor(group))
+  group=as.factor(group),
+  ratio=rating1 / (comments1 + 1))
 
 all.data <- subset(all.data, scp != 1)
 group1 <- subset(all.data, group == 1)
@@ -75,16 +79,16 @@ The average rating of entries belonging to author A (average `r mean(group2$rati
 
 ## Preprocessing
 
-Assign entries not belonging to author A to group 1, and entries belonging to author A to group 2. SCP-001 has been removed from the data, since it has multiple proposals, and the rating and comments recorded are for the hub page for the proposals, and do not correspond to any particular author's entry.
+Assign entries not belonging to author A to group 1, and entries belonging to author A to group 2. SCP-001 has been removed from the data, since it has multiple proposals, and the rating and comments recorded are for the hub page for the proposals, and do not correspond to any particular author's entry. To prevent division by 0, 1 was added to the denominator in the calculation of the rating-comment ratios.
 
 
 ```{r preprocess4}
 head(all.data)
 head(group1)
 head(group2)
-nrow(all.data)
-nrow(group1)
-nrow(group2)
+nrow(all.data) # Total number of observations
+nrow(group1) # Number of replicates in group 1
+nrow(group2) # Number of replicates in group 2
 mean(group1$rating)
 mean(group2$rating)
 mean(group1$rating / (group1$comments + 1))
@@ -92,7 +96,7 @@ mean(group2$rating / (group2$comments + 1))
 ```
 
 
-## Testing whether the the difference between the average ratings of author A's articles and the average ratings of the other authors' articles is significant
+## Testing whether the the difference in ratings is significant
 
 The average rating of entries belonging to author A is greater than the average rating of entries not belonging to author A. This section measures the significance of the difference, by estimating the attributes of a hypothetical random process that produces the rating for each entry.
 
@@ -167,3 +171,36 @@ pvalue <- 1 - pt(d, 5695)
 pvalue
 ```
 The p-value `r pvalue` is greater than $0.1$, so there is insufficient evidence against $H_0$. The difference between the average rating of author A's entries and the average rating of other entries is not statistically significant. Since the model is not an appropriate one, this result should be interpreted with skepticism.
+
+## Testing whether the difference in rating-comment ratio is significant
+
+The average rating-comment ratio of author A is greater than the average rating-comment ratio of other authors on the site. This section measures the significance of the difference, by estimating the attributes of a hypothetical random process that produces the ratio for each entry.
+
+### Model
+
+The model will be the same one as before.
+
+### Assessing appropriateness of model
+
+```{r}
+model <- lm(ratio~group, all.data)
+sigmahat <- summary(model)$sigma
+plot(fitted(model), rstudent(model))
+qqnorm(resid(model))
+qqline(resid(model))
+```
+
+The model is not suitable, mainly due to the right-skewness of the data, which indicates that the distribution of the residuals is probably not Normal.
+
+### Hypothesis test
+
+If we were to perform a hypothesis test anyway, we would be interested in the attribute $\theta = \tau_2 - \tau_1$, and the hypothesis $H_0: \theta \leq 0$ vs. $H_a: \theta > 0$. The math is the same as before.
+
+```{r}
+thetahat <- mean(group2$ratio) - mean(group1$ratio)
+d <- thetahat / ((1 / 5587 + 1 / 110) * sigmahat ^ 2)
+pvalue <- 1 - pt(d, 5695)
+pvalue
+```
+
+The p-value `r pvalue` is less than $0.01$ (it is probably too small for float precision to properly display its value). There is strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant.
