@@ -75,7 +75,7 @@ The average rating of entries belonging to author A (average `r mean(group2$rati
 * The skill level of different authors and the quality of their entries may vary.
 * The rating of an entry depends on its visibility and quality. Some popular SCP entries may reference other entries, causing the visibility of one to depend on the visibility of another. As well, more skilled authors will tend to produce higher-quality entries.
 
-The average rating-comment ratio of entries belonging to author A (average `r mean(group2$rating / (group2$comments + 1))`) is greater than the average rating-comment ratio of other authors (average `r mean(group1$rating / (group1$comments + 1))`). The difference is highly significant. The model used for the analysis was somewhat unsuitable for the analysis, due to the right-skewness of the data caused by negatively-rated entries being removed from the site. Therefore these results should also be interpreted with some skepticism.
+The average rating-comment ratio of entries belonging to author A (average `r mean(group2$rating / (group2$comments + 1))`) is greater than the average rating-comment ratio of other authors (average `r mean(group1$rating / (group1$comments + 1))`). The difference is significant. The model used for the analysis was somewhat unsuitable for the analysis, due to the right-skewness of the data caused by negatively-rated entries being removed from the site. Therefore these results should also be interpreted with some skepticism.
 
 # Calculations
 
@@ -207,4 +207,4 @@ pvalue <- 1 - pt(d, 5695)
 pvalue
 ```
 
-The p-value `r pvalue` is less than $0.01$ (it is probably too small for float precision to properly display its value). There is strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant.
+The p-value `r pvalue` is less than $0.01$ (it is probably too small for float precision to properly display its value). There is strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant. Due to the model not being appropriate, these results should be interpreted with skepticism.
