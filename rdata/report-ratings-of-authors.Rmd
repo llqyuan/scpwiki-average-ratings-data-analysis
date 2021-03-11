@@ -1,5 +1,5 @@
 ---
-title: "Data analysis: Average ratings of authors"
+title: "SCP wiki data analysis: Average ratings of authors"
 output: 
   pdf_document:
     number_sections: true
@@ -148,6 +148,11 @@ If we were to perform a hypothesis test anyway, we would be interested in the at
 
 $$
 \begin{aligned}
+E(\tilde{\theta}) &= E \left( \tilde{\theta} = \tilde{\tau}_2 - \tilde{\tau}_1 = \frac{1}{r_2} \sum_{j=1}^{r_2} Y_{2j} - \frac{1}{r_1} \sum_{j=1}^{r_1} Y_{1j} \right) \\
+&= \frac{1}{r_2} \sum_{j=1}^{r_2} E)Y_{2j} - \frac{1}{r_1} \sum_{j=1}^{r_1} E(Y_{1j}) \\
+&= \frac{1}{r_2} \sum_{j=1}^{r_2} (\mu + \tau_2) - \frac{1}{r_1} \sum_{j=1}^{r_1} (\mu + \tau_1) \\
+&= \mu + \tau_2 - \mu - \tau_1 \\
+&= \theta \\[10px]
 Var(\tilde{\theta}) &= Var \left( \frac{1}{r_2} \sum_{j=1}^{r_2} Y_{2j} - \frac{1}{r_1} \sum_{j=1}^{r_1} Y_{1j} \right) \\
 &= \frac{1}{r_2^2} \sum_{j=1}^{r_2} Var(Y_{2j}) + \frac{1}{r_1^2} \sum_{j=1}^{r_1} Var(Y_{1j}) \\
 &= \frac{1}{5587} \sigma^2 + \frac{1}{110} \sigma^2
