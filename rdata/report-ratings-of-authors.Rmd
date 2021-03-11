@@ -149,7 +149,7 @@ If we were to perform a hypothesis test anyway, we would be interested in the at
 $$
 \begin{aligned}
 E(\tilde{\theta}) &= E \left( \tilde{\theta} = \tilde{\tau}_2 - \tilde{\tau}_1 = \frac{1}{r_2} \sum_{j=1}^{r_2} Y_{2j} - \frac{1}{r_1} \sum_{j=1}^{r_1} Y_{1j} \right) \\
-&= \frac{1}{r_2} \sum_{j=1}^{r_2} E)Y_{2j} - \frac{1}{r_1} \sum_{j=1}^{r_1} E(Y_{1j}) \\
+&= \frac{1}{r_2} \sum_{j=1}^{r_2} E(Y_{2j}) - \frac{1}{r_1} \sum_{j=1}^{r_1} E(Y_{1j}) \\
 &= \frac{1}{r_2} \sum_{j=1}^{r_2} (\mu + \tau_2) - \frac{1}{r_1} \sum_{j=1}^{r_1} (\mu + \tau_1) \\
 &= \mu + \tau_2 - \mu - \tau_1 \\
 &= \theta \\[10px]
