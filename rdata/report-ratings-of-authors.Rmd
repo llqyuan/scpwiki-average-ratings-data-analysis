@@ -59,10 +59,18 @@ for (i in 1:length(scp1)) {
 all.data <- data.frame(
   scp=scp1, 
   rating=rating1, 
-  comments=comments1, 
+  comments=comments1,
   group=as.factor(group),
   ratio=rating1 / (comments1 + 1),
-  authorA=authora)
+  authorA=authora,comments2=comments1 ^ 2,
+  comments3=comments1 ^ 3,
+  comments4=comments1 ^ 4,
+  comments5=comments1 ^ 5,
+  comments6=comments1 ^ 6,
+  comments7=comments1 ^ 7,
+  comments8=comments1 ^ 8,
+  comments9=comments1 ^ 9,
+  comments10=comments1 ^ 10)
 
 all.data <- subset(all.data, scp != 1)
 group1 <- subset(all.data, group == 1)
@@ -85,11 +93,11 @@ The average rating of entries belonging to author A (average `r mean(group2$rati
 
 ## Results for model 2
 
-The average rating-comment ratio of entries belonging to author A (average `r mean(group2$rating / (group2$comments + 1))`) is greater than the average rating-comment ratio of other authors (average `r mean(group1$rating / (group1$comments + 1))`). The difference is significant (p-value $< 0.01$). The model used for the analysis was unsuitable for the analysis, due to the right-skewness of the data caused by negatively-rated entries being removed from the site. Therefore these results should also be interpreted with some skepticism.
+The average rating-comment ratio of entries belonging to author A (average `r mean(group2$rating / (group2$comments + 1))`) is greater than the average rating-comment ratio of other authors (average `r mean(group1$rating / (group1$comments + 1))`). The difference is significant (p-value $< 0.001$). The model used for the analysis was unsuitable for the analysis, due to the right-skewness of the data caused by negatively-rated entries being removed from the site. Therefore these results should also be interpreted with some skepticism.
 
 ## Results for model 3
 
-A linear model fit was done against multiple variables. The model notes the correlation between the number of comments on an article and the rating of the article. This model, while not ideal, was more suitable than the previous two. The difference between the ratings of articles belonging author A and the ratings of articles not belonging to author A is significant (p-value $< 0.01$).
+A linear model fit was done against multiple variables. The model notes the relationship between the number of comments on an article and the rating of the article. This model, while not ideal, was more suitable than the previous two. The difference between the ratings of articles belonging author A and the ratings of articles not belonging to author A is significant (p-value $< 0.001$).
 
 # Calculations
 
@@ -218,7 +226,7 @@ pvalue <- 1 - pt(d, 5695)
 pvalue
 ```
 
-The p-value `r pvalue` is less than $0.01$ (it is probably too small for float precision to properly display its value). There is strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant. Due to the model not being appropriate, these results should be interpreted with skepticism.
+The p-value `r pvalue` is less than $0.001$ (it is probably too small for float precision to properly display its value). There is very strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant. Due to the model not being appropriate, these results should be interpreted with skepticism.
 
 ## Model 3
 
@@ -226,8 +234,9 @@ The p-value `r pvalue` is less than $0.01$ (it is probably too small for float p
 model.data <- subset(all.data, scp != 173)
 model.data <- subset(model.data, scp != 682)
 model.data <- subset(model.data, scp != 106)
-model.data <- subset(model.data, scp != 579)
 model.data <- subset(model.data, scp != 49)
+model.data <- subset(model.data, scp != 2521)
+model.data <- subset(model.data, scp != 579)
 ```
 
 A source of variance in the ratings is the visibility of the article -- that is, how well-known it is in the community. We can attempt to measure this by the number of comments on the article. A linear model fit was done to account for the visibility of the article. 
@@ -236,7 +245,17 @@ We use the model
 
 $$
 \begin{aligned}
-Y &= \beta_0 + \beta_1x_1 + \beta_2x_2 + R, & R \sim N(0,\,\sigma^2)
+Y = \beta_0 + \beta_1x_1 + &\beta_2x_2 \\
++ &\beta_3x_2^2 
++ \beta_4 x_2^3 
++ \beta_5 x_2 ^ 4 
++ \beta_6 x_2 ^ 5
++ \beta_7 x_2^6 
++ \beta_8 x_2^7 
++ \beta_9 x_2^8 
++ \beta_{10} x_2^9 
++ \beta_{11} x_2^{10} \\
++ &R, & R \sim N(0,\,\sigma^2)
 \end{aligned}
 $$
 
@@ -244,23 +263,38 @@ where
 
 * $Y$ is the random response variable, representing the fourth-root of the rating
 * $R$ is the random error
-* $x_1$ is the number of comments, included to account for the visibility of the article
-* $x_2 = 0$ for articles not belonging to author A, and $x_2 = 1$ for articles belonging to author A
+* $x_1 = 0$ for articles not belonging to author A, and $x_1 = 1$ for articles belonging to author A
+* $x_2$ is the number of comments, included to account for the visibility of the article. Higher-order terms are added to improve the fit.
 
 The transformation to the response variable was done to address a violation of the constant-variance assumption (funnel shape in residual plot, suggesting greater variance at higher fitted values).
 
-SCP-173, SCP-682, SCP-106, SCP-579, and SCP-049 were removed from the data, due to them being special situations that were affecting the quality of the model. All were influential outliers, and had large negative residuals. All are early articles that are popular not for their quality, but for their legacy and importance to the lore.
+The following SCP entries were removed from the data, due to being special situations in the wiki and for being extreme outliers in the data:
+
+* SCP-173
+* SCP-682
+* SCP-106
+* SCP-049
+* SCP-579
+* SCP-2521
+
+The first five are early articles that are popular not for their quality, but for their legacy and importance to the lore. The sixth (SCP-2521) is not in a written format.
 
 ### Appropriateness of fit
 
 ```{r linear-model-2}
-model <- lm(rating ^ 0.25 ~ comments + authorA, model.data)
+model <- lm(
+  rating ^ 0.25 ~ 
+    authorA + comments + comments2 + 
+    comments3 + comments4 + comments5 + 
+    comments6 + comments7 + comments8 + 
+    comments9 + comments10, 
+  model.data)
 plot(fitted(model), rstudent(model))
 qqnorm(resid(model))
 qqline(resid(model))
 ```
 
-The residuals mostly fall in a constant band around zero, indicating that the expectation and variance assumptions ($E(R) = 0$, $Var(R) = \sigma^2$) are not obviously violated. The data is somewhat skewed left, but the skewness is less severe than in previous models. Multiple articles belonging to one author may still be a source of dependence.
+The residuals mostly fall in a band around zero, indicating that the expectation assumption ($E(R) = 0$) is not obviously violated. The variance appears to be less at fitted values close to 0, indicating that the constant-variance assumption ($Var(R) = \sigma^2$) may not hold. The data is somewhat skewed left, but the skewness is less severe than in previous models. Multiple articles belonging to one author may still be a source of dependence.
 
 ### Assessing influential observations
 
@@ -272,10 +306,10 @@ The Cook's distance measures the influence of a particular observation on the mo
 
 ### Hypothesis test
 
-We use the hypothesis test $H_0: \beta_2 = 0$ versus $H_a: \beta_2 \neq 0$.
+We use the hypothesis test $H_0: \beta_1 = 0$ versus $H_a: \beta_1 \neq 0$.
 
 ```{r}
 summary(model)
 ```
 
-The p-value for this hypothesis test is `r summary(model)$coefficients[3,4]` $< 0.01$. There is strong evidence against $H_0$. The difference between the ratings of articles belonging to author A and the ratings of articles not belonging to author A is significant.
+The p-value for this hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The difference between the ratings of articles belonging to author A and the ratings of articles not belonging to author A is significant.
