@@ -43,13 +43,16 @@ comments2 <- as.integer(data2$Comments)
 ```{r preprocess3, include=F}
 
 group <- c()
+authora <- c()
 
 for (i in 1:length(scp1)) {
   if (length(which(scp2 == scp1[i])) > 0) {
     group <- append(group, 2)
+    authora <- append(authora, 1)
     
   } else {
     group <- append(group, 1)
+    authora <- append(authora, 0)
   }
 }
 
@@ -58,7 +61,8 @@ all.data <- data.frame(
   rating=rating1, 
   comments=comments1, 
   group=as.factor(group),
-  ratio=rating1 / (comments1 + 1))
+  ratio=rating1 / (comments1 + 1),
+  authorA=authora)
 
 all.data <- subset(all.data, scp != 1)
 group1 <- subset(all.data, group == 1)
@@ -69,13 +73,23 @@ group2 <- subset(all.data, group == 2)
 
 Author A is one of my favourite authors on the site. The goal of this analysis is to determine whether their entries are more well-received by the general SCP wiki community than other authors' entries.
 
-The average rating of entries belonging to author A (average `r mean(group2$rating)`) is greater than the average rating of entries belonging to other authors (average `r mean(group1$rating)`). The difference is probably not significant, though these results should be interpreted skeptically, due to a number of reasons that led to the model used being very unsuitable for the analysis:
+Three models were used. Each attempts to measure the significance of the difference between the popularity of articles belonging to author A and the popularity of articles not belonging to author A by estimating the attributes of a hypothetical random process for each entry. Two found a statistically significant difference. One failed to find such a difference, however this model was unsuitable for the analysis in the extreme. Therefore, the articles belonging to author A are probably more well-received by the general SCP wiki community than the other authors' entries.
+
+## Results for model 1
+
+The average rating of entries belonging to author A (average `r mean(group2$rating)`) is greater than the average rating of entries belonging to other authors (average `r mean(group1$rating)`). The difference is probably not significant (p-value $> 0.1$), though these results should be interpreted skeptically, due to a number of reasons that led to the model used being very unsuitable for the analysis:
 
 * Negatively-rated entries are almost always removed from the site, causing the data to be skewed rightward.
 * The skill level of different authors and the quality of their entries may vary.
 * The rating of an entry depends on its visibility and quality. Some popular SCP entries may reference other entries, causing the visibility of one to depend on the visibility of another. As well, more skilled authors will tend to produce higher-quality entries.
 
-The average rating-comment ratio of entries belonging to author A (average `r mean(group2$rating / (group2$comments + 1))`) is greater than the average rating-comment ratio of other authors (average `r mean(group1$rating / (group1$comments + 1))`). The difference is significant. The model used for the analysis was somewhat unsuitable for the analysis, due to the right-skewness of the data caused by negatively-rated entries being removed from the site. Therefore these results should also be interpreted with some skepticism.
+## Results for model 2
+
+The average rating-comment ratio of entries belonging to author A (average `r mean(group2$rating / (group2$comments + 1))`) is greater than the average rating-comment ratio of other authors (average `r mean(group1$rating / (group1$comments + 1))`). The difference is significant (p-value $< 0.01$). The model used for the analysis was unsuitable for the analysis, due to the right-skewness of the data caused by negatively-rated entries being removed from the site. Therefore these results should also be interpreted with some skepticism.
+
+## Results for model 3
+
+A linear model fit was done against multiple variables. The model notes the correlation between the number of comments on an article and the rating of the article. This model, while not ideal, was more suitable than the previous two. The difference between the ratings of articles belonging author A and the ratings of articles not belonging to author A is significant (p-value $< 0.01$).
 
 # Calculations
 
@@ -98,13 +112,9 @@ mean(group2$rating / (group2$comments + 1))
 ```
 
 
-## Testing whether the the difference in ratings is significant
+## Model 1
 
-The average rating of entries belonging to author A is greater than the average rating of entries not belonging to author A. This section measures the significance of the difference, by estimating the attributes of a hypothetical random process that produces the rating for each entry.
-
-### Model
-
-The separation of the entries into two groups and an unequal number of entries in each of these groups would suggest an unbalanced completely randomized design:
+The model used is an unbalanced completely randomized design:
 
 $$
 \begin{aligned}
@@ -114,7 +124,7 @@ $$
 
 where
 
-* $Y_{ij}$ is the response variable, corresponding to the random process for the rating of an entry
+* $Y_{ij}$ is the response variable, corresponding to the rating of an entry
 * $i=1, 2$ correspond to the treatment groups (entries not belonging to author A, and entries belonging to author A).
 * $j=1, 2, \cdots, 5587$ are the replicates for group 1 (entries not belonging to author A), and $j=1,2,\cdots,110$ are the replicates for group 2 (entries belonging to author A)
 * $\mu$ is the mean rating
@@ -180,13 +190,9 @@ pvalue
 ```
 The p-value `r pvalue` is greater than $0.1$, so there is insufficient evidence against $H_0$. The difference between the average rating of author A's entries and the average rating of other entries is not statistically significant. Since the model is not an appropriate one, this result should be interpreted with skepticism.
 
-## Testing whether the difference in rating-comment ratio is significant
+## Model 2
 
-The average rating-comment ratio of author A is greater than the average rating-comment ratio of other authors on the site. This section measures the significance of the difference, by estimating the attributes of a hypothetical random process that produces the ratio for each entry.
-
-### Model
-
-The model will be the same one as before, aside from a difference in interpretation of the attribute $\mu$: it is now the mean rating-comment ratio.
+The model used is the same as in model 1, aside from a difference in the interpretation of $\mu$ and the response variable $Y_{ij}$: they now correspond to the rating-comment ratio for an entry and the mean rating-comment ratio respectively.
 
 ### Assessing appropriateness of model
 
@@ -213,3 +219,63 @@ pvalue
 ```
 
 The p-value `r pvalue` is less than $0.01$ (it is probably too small for float precision to properly display its value). There is strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant. Due to the model not being appropriate, these results should be interpreted with skepticism.
+
+## Model 3
+
+```{r, include=F}
+model.data <- subset(all.data, scp != 173)
+model.data <- subset(model.data, scp != 682)
+model.data <- subset(model.data, scp != 106)
+model.data <- subset(model.data, scp != 579)
+model.data <- subset(model.data, scp != 49)
+```
+
+A source of variance in the ratings is the visibility of the article -- that is, how well-known it is in the community. We can attempt to measure this by the number of comments on the article. A linear model fit was done to account for the visibility of the article. 
+
+We use the model
+
+$$
+\begin{aligned}
+Y &= \beta_0 + \beta_1x_1 + \beta_2x_2 + R, & R \sim N(0,\,\sigma^2)
+\end{aligned}
+$$
+
+where
+
+* $Y$ is the random response variable, representing the fourth-root of the rating
+* $R$ is the random error
+* $x_1$ is the number of comments, included to account for the visibility of the article
+* $x_2 = 0$ for articles not belonging to author A, and $x_2 = 1$ for articles belonging to author A
+
+The transformation to the response variable was done to address a violation of the constant-variance assumption (funnel shape in residual plot, suggesting greater variance at higher fitted values).
+
+SCP-173, SCP-682, SCP-106, SCP-579, and SCP-049 were removed from the data, due to them being special situations that were affecting the quality of the model. All were influential outliers, and had large negative residuals. All are early articles that are popular not for their quality, but for their legacy and importance to the lore.
+
+### Appropriateness of fit
+
+```{r linear-model-2}
+model <- lm(rating ^ 0.25 ~ comments + authorA, model.data)
+plot(fitted(model), rstudent(model))
+qqnorm(resid(model))
+qqline(resid(model))
+```
+
+The residuals mostly fall in a constant band around zero, indicating that the expectation and variance assumptions ($E(R) = 0$, $Var(R) = \sigma^2$) are not obviously violated. The data is somewhat skewed left, but the skewness is less severe than in previous models. Multiple articles belonging to one author may still be a source of dependence.
+
+### Assessing influential observations
+
+```{r, echo=F}
+plot(model, which=5)
+```
+
+The Cook's distance measures the influence of a particular observation on the model. None of the observations are significantly influential.
+
+### Hypothesis test
+
+We use the hypothesis test $H_0: \beta_2 = 0$ versus $H_a: \beta_2 \neq 0$.
+
+```{r}
+summary(model)
+```
+
+The p-value for this hypothesis test is `r summary(model)$coefficients[3,4]` $< 0.01$. There is strong evidence against $H_0$. The difference between the ratings of articles belonging to author A and the ratings of articles not belonging to author A is significant.
