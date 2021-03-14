@@ -62,7 +62,8 @@ all.data <- data.frame(
   comments=comments1,
   group=as.factor(group),
   ratio=rating1 / (comments1 + 1),
-  authorA=authora,comments2=comments1 ^ 2,
+  authorA=authora,
+  comments2=comments1 ^ 2,
   comments3=comments1 ^ 3,
   comments4=comments1 ^ 4,
   comments5=comments1 ^ 5,
@@ -182,17 +183,17 @@ $\tilde{\theta}$ is a linear combination of Normal random variables, so it's Nor
 $$
 \begin{aligned}
 \tilde{\theta} & \sim N \left(0,\, \left( \frac{1}{5587} + \frac{1}{110} \right) \sigma^2 \right) \\
-\frac{\tilde{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \sigma^2} & \sim N(0,\,1) \\
-\frac{\tilde{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \tilde{\sigma}^2} &\sim t_{n-3+1}
+\frac{\tilde{\theta}}{\sqrt{\left( \frac{1}{5587} + \frac{1}{110} \right) \sigma^2}} & \sim N(0,\,1) \\
+\frac{\tilde{\theta}}{\sqrt{\left( \frac{1}{5587} + \frac{1}{110} \right) \tilde{\sigma}^2}} &\sim t_{n-3+1}
 \end{aligned}
 $$
 
-where $n=5697$ is the number of observations; there are 3 non-$\sigma$ parameters and 1 constraint. The pivotal quantity is $$D = \frac{\tilde{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \tilde{\sigma}^2} \sim t_{5695}$$ The discrepancy statistic is $$d = \frac{\hat{\theta}}{\left( \frac{1}{5587} + \frac{1}{110} \right) \hat{\sigma}^2}$$ The p-value would be $p = Pr(D > d)$.
+where $n=5697$ is the number of observations; there are 3 non-$\sigma$ parameters and 1 constraint. The pivotal quantity is $$D = \frac{\tilde{\theta}}{\sqrt{\left( \frac{1}{5587} + \frac{1}{110} \right) \tilde{\sigma}^2}} \sim t_{5695}$$ The discrepancy statistic is $$d = \frac{\hat{\theta}}{\sqrt{\left( \frac{1}{5587} + \frac{1}{110} \right) \hat{\sigma}^2}}$$ The p-value would be $p = Pr(D > d)$.
 
 
 ```{r}
 thetahat <- mean(group2$rating) - mean(group1$rating)
-d <- thetahat / ((1 / 5587 + 1 / 110) * sigmahat ^ 2)
+d <- thetahat / sqrt( (1 / 5587 + 1 / 110) * sigmahat ^ 2 )
 pvalue <- 1 - pt(d, 5695)
 pvalue
 ```
@@ -221,12 +222,12 @@ If we were to perform a hypothesis test anyway, we would be interested in the at
 
 ```{r}
 thetahat <- mean(group2$ratio) - mean(group1$ratio)
-d <- thetahat / ((1 / 5587 + 1 / 110) * sigmahat ^ 2)
+d <- thetahat / sqrt( (1 / 5587 + 1 / 110) * sigmahat ^ 2 )
 pvalue <- 1 - pt(d, 5695)
 pvalue
 ```
 
-The p-value `r pvalue` is less than $0.001$ (it is probably too small for float precision to properly display its value). There is very strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant. Due to the model not being appropriate, these results should be interpreted with skepticism.
+The p-value `r pvalue` is less than $0.001$. There is very strong evidence against $H_0$. The difference between the rating-comment ratios of author A and other authors is significant. Due to the model not being appropriate, these results should be interpreted with skepticism.
 
 ## Model 3
 
@@ -312,4 +313,4 @@ We use the hypothesis test $H_0: \beta_1 = 0$ versus $H_a: \beta_1 \neq 0$.
 summary(model)
 ```
 
-The coefficient on `authorA` is `r summary(model)$coefficients[2,1]` $> 0$, and the p-value for the hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The difference between the ratings of articles belonging to author A and the ratings of articles not belonging to author A is significant. The articles belonging to author A are probably more well-received by the community than articles belonging to other authors.
+The coefficient on `authorA` is `r summary(model)$coefficients[2,1]` $> 0$, and the p-value for the hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The articles belonging to author A are rated more highly than articles belonging to other authors, and the difference is significant.
