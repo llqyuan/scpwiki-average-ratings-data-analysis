@@ -79,7 +79,7 @@ group2 <- subset(all.data, group == 2)
 
 # Summary
 
-Author A is one of my favourite authors on the site. The goal of this analysis is to determine whether their entries are more well-received by the general SCP wiki community than other authors' entries.
+The SCP wiki is a community-driven creative writing website. Author A is one of my favourite authors on the site. The goal of this analysis is to determine whether their entries are more well-received by the general SCP wiki community than other authors' entries.
 
 Three models were used. Each attempts to measure the significance of the difference between the popularity of articles belonging to author A and the popularity of articles not belonging to author A by estimating the attributes of a hypothetical random process for each entry. Two found a statistically significant difference. One failed to find such a difference, however this model was unsuitable for the analysis in the extreme. Therefore, the articles belonging to author A are probably more well-received by the general SCP wiki community than the other authors' entries.
 
@@ -97,13 +97,13 @@ The average rating-comment ratio of entries belonging to author A (average `r me
 
 ## Results for model 3
 
-A linear model fit was done against multiple variables. The model notes the relationship between the number of comments on an article and the rating of the article. This model, while not ideal, was more suitable than the previous two. The difference between the ratings of articles belonging author A and the ratings of articles not belonging to author A is significant (p-value $< 0.001$).
+A linear model fit was done against multiple variables. The model notes the relationship between the number of comments on an article and the rating of the article. This model, while still not ideal, was more suitable than the previous two. The articles belonging to author A are rated more highly than articles belonging to other authors, and the difference is significant (p-value $< 0.001$).
 
 # Calculations
 
 ## Preprocessing
 
-Assign entries not belonging to author A to group 1, and entries belonging to author A to group 2. SCP-001 has been removed from the data, since it has multiple proposals, and the rating and comments recorded are for the hub page for the proposals, and do not correspond to any particular author's entry. To prevent division by 0, 1 was added to the denominator in the calculation of the rating-comment ratios.
+Assign entries not belonging to author A to group 1, and entries belonging to author A to group 2. SCP-001 has been removed from the data, since it has multiple proposals, and the rating and comments recorded are for the hub page for the proposals, and do not correspond to any particular author's entry. To prevent division by 0, 1 was added to the denominator in the calculation of the rating-comment ratios. The variables `comments2` through `comments10` represent the higher-order terms `comments ^ 2`, `comments ^ 3`, through `comments ^ 10`.
 
 
 ```{r preprocess4}
@@ -239,7 +239,7 @@ model.data <- subset(model.data, scp != 2521)
 model.data <- subset(model.data, scp != 579)
 ```
 
-A source of variance in the ratings is the visibility of the article -- that is, how well-known it is in the community. We can attempt to measure this by the number of comments on the article. A linear model fit was done to account for the visibility of the article. 
+A source of variance in the ratings is the visibility of the article -- that is, how well-known it is in the community. Articles that are seen by more people tend to be rated more highly. We can attempt to measure this by the number of comments on the article. A linear model fit was done to account for the visibility of the article. 
 
 We use the model
 
@@ -312,4 +312,4 @@ We use the hypothesis test $H_0: \beta_1 = 0$ versus $H_a: \beta_1 \neq 0$.
 summary(model)
 ```
 
-The p-value for this hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The difference between the ratings of articles belonging to author A and the ratings of articles not belonging to author A is significant.
+The coefficient on `authorA` is `r summary(model)$coefficients[2,1]` $> 0$, and the p-value for the hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The difference between the ratings of articles belonging to author A and the ratings of articles not belonging to author A is significant. The articles belonging to author A are probably more well-received by the community than articles belonging to other authors.
