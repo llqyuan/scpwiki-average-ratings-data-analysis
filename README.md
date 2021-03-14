@@ -1,6 +1,6 @@
 # SCP wiki data analysis project
 
-Compares the ratings of entries belonging to different authors on the site. Average ratings were obtained by web scraping. When possible, ratings for specific authors were obtained manually from their dedicated author pages. Data was analyzed using R; the report can be found in rdata/report-ratings-of-authors.pdf.
+Compares the ratings of entries belonging to different authors on the site. Average ratings were obtained by web scraping. Data was analyzed using R; the report can be found in rdata/report-ratings-of-authors.pdf.
 
 ## Technologies
 
