@@ -86,7 +86,7 @@ Three models were used. Each attempts to measure the significance of the differe
 
 ## Results for model 1
 
-The average rating of entries belonging to author A (average `r mean(group2$rating)`) is greater than the average rating of entries belonging to other authors (average `r mean(group1$rating)`). The difference is probably not significant (p-value $> 0.1$), though these results should be interpreted skeptically, due to a number of reasons that led to the model used being very unsuitable for the analysis:
+The average rating of entries belonging to author A (average `r mean(group2$rating)`) is greater than the average rating of entries belonging to other authors (average `r mean(group1$rating)`). The difference is not significant (p-value $> 0.1$), though these results should be interpreted skeptically, due to a number of reasons that led to the model used being very unsuitable for the analysis:
 
 * Negatively-rated entries are almost always removed from the site, causing the data to be skewed rightward.
 * The skill level of different authors and the quality of their entries may vary.
@@ -313,4 +313,4 @@ We use the hypothesis test $H_0: \beta_1 = 0$ versus $H_a: \beta_1 \neq 0$.
 summary(model)
 ```
 
-The coefficient on `authorA` is `r summary(model)$coefficients[2,1]` $> 0$, and the p-value for the hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The articles belonging to author A are rated more highly than articles belonging to other authors, and the difference is significant.
+The estimate of the coefficient on `authorA` is $\hat{\beta}_1 =$ `r summary(model)$coefficients[2,1]` $> 0$, and the p-value for the hypothesis test is `r summary(model)$coefficients[2,4]` $< 0.001$. There is very strong evidence against $H_0$. The articles belonging to author A are rated more highly than articles belonging to other authors, and the difference is significant.
